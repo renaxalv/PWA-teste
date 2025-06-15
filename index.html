@@ -453,29 +453,45 @@
     `;
     document.head.appendChild(style);
 
-    // --- INÍCIO DO NOVO CÓDIGO PARA O MODAL E APPS SCRIPT ---
-    // Seleção de elementos do modal
+    // --- NOVO CÓDIGO PARA O MODAL E INICIALIZAÇÃO MAIS SEGURA DO APPS SCRIPT ---
     const modal = document.getElementById('myModal');
     const feelingInput = document.getElementById('feelingInput');
     const saveFeelingBtn = document.getElementById('saveFeelingBtn');
     const modalMessage = document.getElementById('modalMessage');
 
-    // Função para mostrar o modal
     function showModal() {
       modal.classList.add('active');
-      feelingInput.value = ''; // Limpa o input ao abrir
-      modalMessage.textContent = ''; // Limpa a mensagem
-      feelingInput.focus(); // Coloca o foco no input
+      feelingInput.value = '';
+      modalMessage.textContent = '';
+      feelingInput.focus();
     }
 
-    // Função para esconder o modal
     function hideModal() {
       modal.classList.remove('active');
     }
 
-    // Exibe o modal automaticamente ao carregar a página
+    // Função para verificar se google.script.run está pronto e mostrar o modal
+    function initializeModalWithAppsScriptCheck(retries = 0) {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            console.log('google.script.run está disponível. Exibindo modal.');
+            showModal();
+        } else {
+            console.log('Aguardando google.script.run... Tentativa:', retries + 1);
+            if (retries < 10) { // Tentar 10 vezes com um pequeno atraso
+                setTimeout(() => initializeModalWithAppsScriptCheck(retries + 1), 500); // Tenta novamente em 500ms
+            } else {
+                console.error('google.script.run não ficou disponível após várias tentativas. Verifique a URL do Apps Script e possíveis bloqueios.');
+                // Exibe uma mensagem de erro persistente se não carregar
+                modalMessage.textContent = 'Erro: Não foi possível conectar ao serviço. Verifique sua conexão ou tente novamente.';
+                modalMessage.style.color = '#EA4335';
+                showModal(); // Mostra o modal com a mensagem de erro
+            }
+        }
+    }
+
+    // Inicia o processo de verificação quando o DOM estiver carregado
     document.addEventListener('DOMContentLoaded', () => {
-      showModal();
+        initializeModalWithAppsScriptCheck();
     });
 
     // Event listener para o botão "Salvar" dentro do modal
@@ -483,35 +499,35 @@
       const feeling = feelingInput.value.trim();
       if (feeling) {
         modalMessage.textContent = 'Salvando...';
-        modalMessage.style.color = '#4285F4'; // Cor azul para "Salvando..."
+        modalMessage.style.color = '#4285F4'; 
         
-        // Chama a função Apps Script "salvarDados"
+        // Garante que google.script.run está disponível antes de chamar
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run
             .withSuccessHandler(response => {
                 if (response.success) {
                 modalMessage.textContent = response.message;
-                modalMessage.style.color = '#34A853'; // Cor verde para sucesso
-                setTimeout(hideModal, 1500); // Esconde o modal após 1.5 segundos
+                modalMessage.style.color = '#34A853';
+                setTimeout(hideModal, 1500); 
                 } else {
                 modalMessage.textContent = response.message;
-                modalMessage.style.color = '#EA4335'; // Cor vermelha para erro
+                modalMessage.style.color = '#EA4335';
                 }
             })
             .withFailureHandler(error => {
                 modalMessage.textContent = 'Erro ao conectar com o servidor: ' + error.message;
-                console.error('Apps Script Error:', error); // Log para depuração
+                console.error('Apps Script Error:', error);
                 modalMessage.style.color = '#EA4335';
             })
             .salvarDados(feeling);
         } else {
-            modalMessage.textContent = 'Erro: Conexão com Apps Script não estabelecida. Verifique a URL.';
+            modalMessage.textContent = 'Erro: A conexão com o Apps Script não está pronta.';
             modalMessage.style.color = '#EA4335';
-            console.error('google.script.run is not available. Check the Apps Script URL in the <script> tag.');
+            console.error('google.script.run is not available on button click.');
         }
       } else {
         modalMessage.textContent = 'Por favor, digite algo antes de salvar.';
-        modalMessage.style.color = '#EA4335'; // Cor vermelha para aviso
+        modalMessage.style.color = '#EA4335'; 
       }
     });
 
