@@ -356,7 +356,7 @@
     </div>
   </div>
 
-  <script src="https://script.google.com/macros/s/AKfycbwWUnKjT8LxKmsd3V7NKUKt-AQzbjfcrHMqAtunDC7cryd28k-1hF4_EUecBDAo7bChZg/exec"></script>
+  <script src="https://script.google.com/macros/s/AKfycbwMz2hCbEKnQXrKY-Mk68FsfHxjVXnIPf5UWutwMo3yeI9CZLAESqHxtsopkpu7VgOkAw/exec"></script>
 
   <script>
     // Controle do botão de ação existente
@@ -486,7 +486,6 @@
         modalMessage.style.color = '#4285F4'; // Cor azul para "Salvando..."
         
         // Chama a função Apps Script "salvarDados"
-        // Esta chamada só funcionará se a tag <script> acima com a URL do Apps Script for carregada com sucesso.
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run
             .withSuccessHandler(response => {
