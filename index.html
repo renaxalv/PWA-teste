@@ -5,18 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meu PWA Completo</title>
   
-  <!-- Meta tags PWA -->
   <meta name="theme-color" content="#4285F4">
   <meta name="description" content="Aplicativo PWA de teste completo">
   
-  <!-- Ícones -->
   <link rel="icon" href="https://raw.githubusercontent.com/renaxalv/pwa-assets-luft/main/icon-192.png">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/renaxalv/pwa-assets-luft/main/icon-192.png">
   
-  <!-- Manifesto PWA (formatado corretamente) -->
   <link rel="manifest" href="manifest.json">
   
-  <!-- CSS completo -->
   <style>
     :root {
       --primary: #4285F4;
@@ -225,6 +221,97 @@
       50% { opacity: 1; }
       100% { opacity: 0.6; }
     }
+
+    /* Estilos do Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 350px;
+      width: 90%;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-content h2 {
+      color: var(--primary);
+      margin-bottom: 25px;
+      font-size: 24px;
+    }
+
+    .modal-content input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 12px;
+      margin-bottom: 25px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .modal-content input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+    }
+
+    .modal-content button {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(52, 168, 83, 0.3);
+    }
+
+    .modal-content button:hover {
+      background: #2a8a43;
+      transform: translateY(-2px);
+    }
+
+    .modal-message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+      min-height: 20px; /* Garante espaço para a mensagem */
+    }
   </style>
 </head>
 <body>
@@ -260,9 +347,19 @@
     <p class="status">Conectado ao GitHub Pages</p>
   </div>
 
-  <!-- JavaScript completo -->
+  <div class="modal-overlay" id="myModal">
+    <div class="modal-content">
+      <h2>Como estou hoje? 🤔</h2>
+      <input type="text" id="feelingInput" placeholder="Ex: Feliz, Cansado, Produtivo..." autocomplete="off">
+      <button id="saveFeelingBtn">Salvar</button>
+      <p class="modal-message" id="modalMessage"></p>
+    </div>
+  </div>
+
+  <script src="https://script.google.com/macros/s/AKfycbwWUnKjT8LxKmsd3V7NKUKt-AQzbjfcrHMqAtunDC7cryd28k-1hF4_EUecBDAo7bChZg/exec"></script>
+
   <script>
-    // Controle do botão de ação
+    // Controle do botão de ação existente
     const actionBtn = document.getElementById('actionBtn');
     actionBtn.addEventListener('click', () => {
       actionBtn.textContent = 'Processando...';
@@ -284,7 +381,7 @@
       }, 1000);
     });
 
-    // Controle de instalação PWA
+    // Controle de instalação PWA existente
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
     
@@ -313,7 +410,7 @@
       installBtn.style.display = 'none';
     });
 
-    // Efeito de confete
+    // Efeito de confete existente
     function createConfetti() {
       const confetti = document.createElement('div');
       confetti.innerHTML = ['🎉', '✨', '🌟', '💫'][Math.floor(Math.random() * 4)];
@@ -331,7 +428,7 @@
       }, 3000);
     }
 
-    // Registro do Service Worker
+    // Registro do Service Worker existente
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
@@ -344,7 +441,7 @@
       });
     }
 
-    // Adiciona estilos dinâmicos para a animação de confete
+    // Adiciona estilos dinâmicos para a animação de confete (se não estiver em style.css)
     const style = document.createElement('style');
     style.textContent = `
       @keyframes fall {
@@ -355,6 +452,77 @@
       }
     `;
     document.head.appendChild(style);
+
+    // --- INÍCIO DO NOVO CÓDIGO PARA O MODAL E APPS SCRIPT ---
+    // Seleção de elementos do modal
+    const modal = document.getElementById('myModal');
+    const feelingInput = document.getElementById('feelingInput');
+    const saveFeelingBtn = document.getElementById('saveFeelingBtn');
+    const modalMessage = document.getElementById('modalMessage');
+
+    // Função para mostrar o modal
+    function showModal() {
+      modal.classList.add('active');
+      feelingInput.value = ''; // Limpa o input ao abrir
+      modalMessage.textContent = ''; // Limpa a mensagem
+      feelingInput.focus(); // Coloca o foco no input
+    }
+
+    // Função para esconder o modal
+    function hideModal() {
+      modal.classList.remove('active');
+    }
+
+    // Exibe o modal automaticamente ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      showModal();
+    });
+
+    // Event listener para o botão "Salvar" dentro do modal
+    saveFeelingBtn.addEventListener('click', () => {
+      const feeling = feelingInput.value.trim();
+      if (feeling) {
+        modalMessage.textContent = 'Salvando...';
+        modalMessage.style.color = '#4285F4'; // Cor azul para "Salvando..."
+        
+        // Chama a função Apps Script "salvarDados"
+        // Esta chamada só funcionará se a tag <script> acima com a URL do Apps Script for carregada com sucesso.
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+            .withSuccessHandler(response => {
+                if (response.success) {
+                modalMessage.textContent = response.message;
+                modalMessage.style.color = '#34A853'; // Cor verde para sucesso
+                setTimeout(hideModal, 1500); // Esconde o modal após 1.5 segundos
+                } else {
+                modalMessage.textContent = response.message;
+                modalMessage.style.color = '#EA4335'; // Cor vermelha para erro
+                }
+            })
+            .withFailureHandler(error => {
+                modalMessage.textContent = 'Erro ao conectar com o servidor: ' + error.message;
+                console.error('Apps Script Error:', error); // Log para depuração
+                modalMessage.style.color = '#EA4335';
+            })
+            .salvarDados(feeling);
+        } else {
+            modalMessage.textContent = 'Erro: Conexão com Apps Script não estabelecida. Verifique a URL.';
+            modalMessage.style.color = '#EA4335';
+            console.error('google.script.run is not available. Check the Apps Script URL in the <script> tag.');
+        }
+      } else {
+        modalMessage.textContent = 'Por favor, digite algo antes de salvar.';
+        modalMessage.style.color = '#EA4335'; // Cor vermelha para aviso
+      }
+    });
+
+    // Fechar o modal clicando fora dele
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        hideModal();
+      }
+    });
+    // --- FIM DO NOVO CÓDIGO PARA O MODAL E APPS SCRIPT ---
   </script>
 </body>
 </html>
