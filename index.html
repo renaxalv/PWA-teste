@@ -1,32 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meu PWA Animado</title>
+  <title>Meu PWA Completo</title>
   
   <!-- Meta tags PWA -->
   <meta name="theme-color" content="#4285F4">
-  <link rel="icon" href="assets/icon-192.png" type="image/png">
+  <meta name="description" content="Aplicativo PWA de teste completo">
   
-  <!-- Manifesto PWA externo -->
+  <!-- Ícones -->
+  <link rel="icon" href="https://raw.githubusercontent.com/renaxalv/pwa-assets-luft/main/icon-192.png">
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/renaxalv/pwa-assets-luft/main/icon-192.png">
+  
+  <!-- Manifesto PWA (formatado corretamente) -->
   <link rel="manifest" href="manifest.json">
   
-  <!-- Registro do Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registrado com sucesso:', registration.scope);
-          })
-          .catch(error => {
-            console.log('Falha ao registrar ServiceWorker:', error);
-          });
-      });
-    }
-  </script>
-  
+  <!-- CSS completo -->
   <style>
     :root {
       --primary: #4285F4;
@@ -193,6 +183,11 @@
       left: 100%;
     }
     
+    #installBtn {
+      display: none;
+      margin-top: 20px;
+    }
+    
     .floating-icons {
       position: absolute;
       top: 0;
@@ -241,8 +236,8 @@
       <div style="left: 70%; top: 20%; font-size: 20px;">🌐</div>
     </div>
     
-    <h1>Meu PWA Animado</h1>
-    <p>Uma experiência completa com suporte offline!</p>
+    <h1>Meu PWA Completo</h1>
+    <p>Agora com todos os elementos necessários para funcionar corretamente!</p>
     
     <div class="features">
       <div class="feature">
@@ -259,42 +254,66 @@
       </div>
     </div>
     
-    <button class="btn" id="actionBtn">Experimente</button>
+    <button class="btn" id="actionBtn">Testar Funcionalidade</button>
+    <button class="btn" id="installBtn">Instalar App</button>
     
-    <p class="status">Conectado ao Google Apps Script</p>
+    <p class="status">Conectado ao GitHub Pages</p>
   </div>
 
+  <!-- JavaScript completo -->
   <script>
-    // Animação no botão
-    const btn = document.getElementById('actionBtn');
-    btn.addEventListener('click', () => {
-      btn.textContent = 'Carregando...';
-      btn.style.background = 'var(--secondary)';
+    // Controle do botão de ação
+    const actionBtn = document.getElementById('actionBtn');
+    actionBtn.addEventListener('click', () => {
+      actionBtn.textContent = 'Processando...';
+      actionBtn.style.background = 'var(--secondary)';
       
-      // Chamada ao Apps Script
-      fetch('https://script.google.com/macros/s/AKfycbwWUnKjT8LxKmsd3V7NKUKt-AQzbjfcrHMqAtunDC7cryd28k-1hF4_EUecBDAo7bChZg/exec')
-        .then(response => response.json())
-        .then(data => {
-          btn.textContent = 'Sucesso!';
-          btn.style.background = 'var(--accent)';
-          
-          // Efeito de confete visual
-          for (let i = 0; i < 20; i++) {
-            createConfetti();
-          }
-          
-          setTimeout(() => {
-            btn.textContent = 'Experimente';
-            btn.style.background = 'var(--primary)';
-          }, 2000);
-        })
-        .catch(error => {
-          console.error('Erro:', error);
-          btn.textContent = 'Erro :(';
-          btn.style.background = 'var(--accent)';
-        });
+      setTimeout(() => {
+        actionBtn.textContent = 'Sucesso!';
+        actionBtn.style.background = 'var(--accent)';
+        
+        // Efeito de confete
+        for (let i = 0; i < 20; i++) {
+          createConfetti();
+        }
+        
+        setTimeout(() => {
+          actionBtn.textContent = 'Testar Funcionalidade';
+          actionBtn.style.background = 'var(--primary)';
+        }, 2000);
+      }, 1000);
     });
+
+    // Controle de instalação PWA
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
     
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+      
+      installBtn.addEventListener('click', () => {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('Usuário aceitou a instalação');
+          } else {
+            console.log('Usuário recusou a instalação');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    // Verifica se o app já está instalado
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA instalado com sucesso');
+      installBtn.style.display = 'none';
+    });
+
+    // Efeito de confete
     function createConfetti() {
       const confetti = document.createElement('div');
       confetti.innerHTML = ['🎉', '✨', '🌟', '💫'][Math.floor(Math.random() * 4)];
@@ -311,7 +330,20 @@
         confetti.remove();
       }, 3000);
     }
-    
+
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registrado com sucesso:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Falha ao registrar ServiceWorker:', error);
+          });
+      });
+    }
+
     // Adiciona estilos dinâmicos para a animação de confete
     const style = document.createElement('style');
     style.textContent = `
