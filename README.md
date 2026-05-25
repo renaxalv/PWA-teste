@@ -1,2 +1,0 @@
-# PWA-teste
-PWA teste
